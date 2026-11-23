@@ -1,6 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from .notif_api import NotificationList
+from .releves import ReleveView
 from . import views
 
 router = DefaultRouter()
@@ -12,6 +13,7 @@ router.register("constats", views.ConstatViewSet, basename="constat")
 
 urlpatterns = [
     path("mesures/", views.IngestionView.as_view(), name="ingestion"),
+    path("releves/", ReleveView.as_view(), name="releves"),
     path("", include(router.urls)),
     path("notifications/", NotificationList.as_view()),
 ]

@@ -11,6 +11,7 @@ Usage :
     python3 simulateur.py --aleatoire       # démarre directement en mode aléatoire
     python3 simulateur.py --intervalle 1 --seed 42
     python3 simulateur.py --port-controle 8010
+    python3 simulateur.py --hote-controle 0.0.0.0   # (utilisé dans Docker)
 Ctrl+C pour arrêter.
 """
 import argparse
@@ -236,7 +237,7 @@ setInterval(refresh,1000);refresh();
 </script></body></html>"""
 
 
-def lancer_panneau(net, port):
+def lancer_panneau(net, hote, port):
     class H(BaseHTTPRequestHandler):
         def log_message(self, *a):
             pass
@@ -265,7 +266,7 @@ def lancer_panneau(net, port):
                 self._rep(400, '{"detail":"commande inconnue"}')
 
     try:
-        srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+        srv = ThreadingHTTPServer((hote, port), H)
     except OSError as e:
         print(f"! Panneau de contrôle indisponible (port {port} : {e}). Utilisez --port-controle.")
         return
@@ -291,6 +292,8 @@ def main():
     ap.add_argument("--url", default="http://localhost:8000")
     ap.add_argument("--intervalle", type=float, default=1.0, help="secondes entre deux relevés")
     ap.add_argument("--port-controle", type=int, default=8001, help="port du panneau de contrôle")
+    ap.add_argument("--hote-controle", default="127.0.0.1",
+                    help="adresse d'écoute du panneau (0.0.0.0 dans Docker)")
     ap.add_argument("--aleatoire", action="store_true", help="démarre en mode aléatoire")
     ap.add_argument("--proba-fuite", type=float, default=0.012)
     ap.add_argument("--proba-coupure", type=float, default=0.008)
@@ -300,7 +303,7 @@ def main():
         random.seed(args.seed)
 
     net = Reseau(args)
-    lancer_panneau(net, args.port_controle)
+    lancer_panneau(net, args.hote_controle, args.port_controle)
     print(f"Simulateur ESP32 -> {args.url}/api/releves/  (mode {net.mode}, Ctrl+C pour arrêter)")
     tampon = []  # simule la microSD
 

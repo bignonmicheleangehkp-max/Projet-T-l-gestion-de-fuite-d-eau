@@ -1,0 +1,6 @@
+# Force des fins de ligne Unix (LF) pour les fichiers exécutés dans les conteneurs Linux,
+# même si le dépôt est cloné sous Windows.
+*.sh          text eol=lf
+Dockerfile    text eol=lf
+*.py          text eol=lf
+docker-compose.yml text eol=lf
